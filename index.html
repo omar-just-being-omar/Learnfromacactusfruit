@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Learn from a cactus fruit</title>
+  <style>
+    :root{--duration:7500ms}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, Arial, sans-serif;background:#000}
+    .wrap{height:100%;display:flex;align-items:center;justify-content:center}
+    .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:40px;box-sizing:border-box;transition:opacity 800ms ease,transform 800ms ease;opacity:0;transform:scale(1.02)}
+    .slide.visible{opacity:1;transform:scale(1)}
+    .card{max-width:1100px;width:100%;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);padding:28px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.6);color:#fff}
+    h1{margin:0;font-size:34px;letter-spacing:0.6px}
+    p{margin:10px 0 0;font-size:20px;line-height:1.25}
+    .small{font-size:16px;opacity:0.9}
+    .credit{position:fixed;left:12px;bottom:12px;color:#ddd;font-size:13px}
+    .progress{position:fixed;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.08)}
+    .bar{height:100%;width:0%;background:linear-gradient(90deg,rgba(123, 97, 255,0.9), rgba(0,200,255,0.9));transition:width 250ms linear}
+    .controls{position:fixed;right:12px;bottom:12px}
+    button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:8px 10px;border-radius:8px;cursor:pointer}
+    /* backgrounds */
+    .bg-1{background-image:url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1600&auto=format&fit=crop');background-size:cover;background-position:center}
+    .bg-2{background-image:url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1600&auto=format&fit=crop&sat=-30');background-size:cover;background-position:center}
+    .bg-3{background-image:url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1600&auto=format&fit=crop');background-size:cover;background-position:center}
+    .bg-4{background-image:url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1600&auto=format&fit=crop&sat=-10');background-size:cover;background-position:center}
+    .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.35),rgba(0,0,0,0.6));border-radius:0}
+    @media (max-width:600px){h1{font-size:22px}p{font-size:16px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="slide1" class="slide bg-1 visible">
+      <div class="card">
+        <h1>Team Shawky</h1>
+        <p class="small">NASA Space Apps Challenge</p>
+        <p style="margin-top:18px;font-size:22px">We created a web application that teaches students about the universe using efficient and fun ways.</p>
+      </div>
+    </div>
+
+    <div id="slide2" class="slide bg-2">
+      <div class="card">
+        <h1>The Problem</h1>
+        <p>Many students find learning about the universe difficult or boring — traditional methods fail to engage them.</p>
+      </div>
+    </div>
+
+    <div id="slide3" class="slide bg-3">
+      <div class="card">
+        <h1>Our Solution</h1>
+        <p>Our web app uses interactive tools, visuals, quizzes, and short simulations to teach complex space concepts quickly and enjoyably.</p>
+      </div>
+    </div>
+
+    <div id="slide4" class="slide bg-4">
+      <div class="card">
+        <h1>Impact</h1>
+        <p>Make space science easier to understand and inspire the next generation of explorers.</p>
+        <p style="margin-top:12px; font-weight:600;">Thank you — Team Shawky</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="progress"><div id="bar" class="bar"></div></div>
+  <div class="controls">
+    <button id="restart">Restart</button>
+  </div>
+  
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const duration = 7500; // ms per slide -> 4 * 7500 = 30000ms
+    const bar = document.getElementById('bar');
+    let index = 0;
+    let startTime = Date.now();
+    let timer;
+
+    function show(i){
+      slides.forEach((s,idx)=>s.classList.toggle('visible', idx===i));
+    }
+
+    function tick(){
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(100, (elapsed / (duration*slides.length)) * 100);
+      bar.style.width = progress + '%';
+      const current = Math.floor(elapsed / duration);
+      if(current !== index && current < slides.length){
+        index = current;
+        show(index);
+      }
+      if(elapsed < duration*slides.length){
+        timer = requestAnimationFrame(tick);
+      } else {
+        // end: show last slide and stop
+        show(slides.length-1);
+        bar.style.width = '100%';
+        cancelAnimationFrame(timer);
+      }
+    }
+
+    document.getElementById('restart').addEventListener('click', ()=>{
+      cancelAnimationFrame(timer);
+      index=0; startTime = Date.now(); bar.style.width='0%'; show(0); tick();
+    });
+
+    // start
+    show(0);
+    tick();
+
+    // allow quick customization from URL params: ?team=Name
+    function getParam(name){const u=new URLSearchParams(location.search);return u.get(name)}
+    const team = getParam('team'); if(team){document.querySelectorAll('h1')[0].textContent = 'Team ' + team;document.querySelectorAll('.card p')[0].textContent = 'NASA Space Apps Challenge';document.querySelectorAll('.card p')[1].textContent='We created a web application that teaches students about the universe using efficient and fun ways.'}
+  </script>
+</body>
+</html>
